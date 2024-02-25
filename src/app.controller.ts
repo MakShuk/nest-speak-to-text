@@ -1,8 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, OnModuleInit } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
-export class AppController {
+export class AppController implements OnModuleInit {
+	onModuleInit() {
+		this.appService.keyAction();
+	}
 	constructor(private readonly appService: AppService) {}
 
 	@Get('record-and-convert-to-text')
