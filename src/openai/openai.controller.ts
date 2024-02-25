@@ -20,7 +20,7 @@ export class OpenaiController {
 
 	@Get('stream-response')
 	async streamResponse(@Res() res: Response): Promise<Stream<ChatCompletionChunk> | string> {
-		const message = this.openaiService.createUserMessage('Расскажи подробно он докер compose');
+		const message = this.openaiService.createUserMessage('Расскажи подробно о докер compose');
 		const yourStream = await this.openaiService.streamResponse([message]);
 		if (yourStream instanceof Stream) {
 			res.setHeader('Content-Type', 'application/octet-stream');
