@@ -9,4 +9,8 @@ export class AppController {
 	async recordAndConvertToText(): Promise<string> {
 		return await this.appService.recordAndConvertToText();
 	}
+	@Get('key-action')
+	keyAction(): void {
+		this.appService.keyAction();
+	}
 }

@@ -56,3 +56,7 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 audio.wav
 test.wav
+output.wav
+output.wav
+output.raw
+output.wav
