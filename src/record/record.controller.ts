@@ -5,8 +5,20 @@ import { RecordService } from './record.service';
 export class RecordController {
 	constructor(private readonly recordService: RecordService) {}
 
-	@Get()
-	findAll() {
-		return this.recordService.findAll();
+	@Get('convert')
+	convertToWav() {
+		return this.recordService.convertToWav();
+	}
+
+	@Get('record')
+	RecordVoice() {
+		return this.recordService.recordVoice();
+	}
+
+	@Get('record-and-convert')
+	async transcribe() {
+		await this.recordService.recordVoice();
+		await this.recordService.convertToWav();
+		return 'recorded and converted to wav!';
 	}
 }

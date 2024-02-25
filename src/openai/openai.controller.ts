@@ -43,7 +43,7 @@ export class OpenaiController {
 	async transcriptionAudio(@Res() res: Response): Promise<ExtendedChatCompletionMessage | string> {
 		try {
 			const stream: fs.ReadStream = fs.createReadStream(
-				'C:/development/NestJS/speak-to-text/audio.wav',
+				'C:/development/NestJS/speak-to-text/output.wav',
 			);
 			const response = await this.openaiService.transcriptionAudio(stream);
 			if (response.error) {
