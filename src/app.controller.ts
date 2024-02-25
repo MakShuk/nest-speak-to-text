@@ -13,4 +13,10 @@ export class AppController {
 	keyAction(): void {
 		this.appService.keyAction();
 	}
+
+	@Get('paste-key-action')
+	async pasteKeyAction(): Promise<void> {
+		await new Promise(resolve => setTimeout(resolve, 1000));
+		this.appService.pasteKeyAction();
+	}
 }

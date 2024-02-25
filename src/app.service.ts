@@ -4,9 +4,11 @@ import { OpenaiService } from './openai/openai.service';
 import { GlobalKeyboardListener } from 'node-global-key-listener';
 import * as copyPaste from 'copy-paste';
 import * as fs from 'fs';
+import * as robot from 'robotjs';
 
 @Injectable()
 export class AppService {
+	textInBuffer: string;
 	constructor(
 		private readonly recordService: RecordService,
 		private readonly openaiService: OpenaiService,
@@ -17,8 +19,7 @@ export class AppService {
 		const stream = fs.createReadStream('C:/development/NestJS/speak-to-text/output.wav');
 		const result = await this.openaiService.transcriptionAudio(stream);
 		const text = result.content || 'Ошибка при чтении файла';
-		copyPaste.copy(text);
-		copyPaste.paste();
+		this.textInBuffer = text;
 		return text;
 	};
 
@@ -27,8 +28,26 @@ export class AppService {
 
 		v.addListener(e => {
 			if (e.state == 'DOWN' && e.name == 'F19') {
-				this.recordAndConvertToText();
+				this.recordAndConvertToText().then(() => {
+					this.pasteKeyAction();
+				});
 			}
 		});
+	}
+
+	async pasteKeyAction(): Promise<void> {
+		console.log('textInBuffer', this.textInBuffer);
+		await new Promise((resolve, reject) => {
+			copyPaste.copy(this.textInBuffer, error => {
+				if (error) {
+					reject(error);
+				} else {
+					resolve('Text copied to clipboard');
+				}
+			});
+		});
+		robot.keyToggle('control', 'down');
+		robot.keyTap('v');
+		robot.keyToggle('control', 'up');
 	}
 }
