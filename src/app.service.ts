@@ -14,7 +14,7 @@ export class AppService {
 		private readonly openaiService: OpenaiService,
 	) {}
 	recordAndConvertToText = async (): Promise<string> => {
-		await this.recordService.recordVoice();
+		await this.recordService.recordVoiceNew();
 		await this.recordService.convertToWav();
 		const stream = fs.createReadStream('C:/development/NestJS/speak-to-text/output.wav');
 		const result = await this.openaiService.transcriptionAudio(stream);

@@ -3,12 +3,13 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 
 const mic = require('mic');
+const Mic = require('node-microphone');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('ffmpeg-static');
 
 @Injectable()
 export class RecordService {
-	async recordVoice() {
+	async recordVoiceOld() {
 		const micInstance = mic({
 			rate: '16000',
 			channels: '1',
@@ -62,6 +63,26 @@ export class RecordService {
 					reject(err);
 				})
 				.run();
+		});
+	}
+
+	async recordVoiceNew() {
+		const outputFileStream = fs.createWriteStream('output.raw');
+		const mic = new Mic();
+		const micStream = mic.startRecording();
+		micStream.pipe(outputFileStream);
+		await new Promise(resolve => {
+			setTimeout(() => {
+				console.info('stopped recording');
+				mic.stopRecording();
+				resolve('stopped recording');
+			}, 5000);
+		});
+		mic.on('info', info => {
+			console.log(info);
+		});
+		mic.on('error', error => {
+			console.log(error);
 		});
 	}
 }
