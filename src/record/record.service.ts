@@ -2,45 +2,13 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 
-const mic = require('mic');
 const Mic = require('node-microphone');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('ffmpeg-static');
 
 @Injectable()
 export class RecordService {
-	async recordVoiceOld() {
-		const micInstance = mic({
-			rate: '16000',
-			channels: '1',
-			encoding: 'signed-integer',
-			debug: true,
-			exitOnSilence: 'silence',
-			fileType: 'wav',
-		});
-
-		const micInputStream = micInstance.getAudioStream();
-		const outputFileStream = fs.createWriteStream('output.raw');
-
-		micInputStream.pipe(outputFileStream);
-
-		micInputStream.on('data', function (data) {
-			console.log('Recieved Input Stream: ' + data.length);
-		});
-
-		micInputStream.on('error', function (err) {
-			console.log('Error in Input Stream: ' + err);
-		});
-
-		micInstance.start();
-
-		return new Promise(resolve => {
-			setTimeout(() => {
-				micInstance.stop();
-				resolve('Recording stopped');
-			}, 5000);
-		});
-	}
+	recordingStatus: 'recording' | 'stops' | 'end' = 'end';
 
 	async convertToWav() {
 		return new Promise((resolve, reject) => {
@@ -50,7 +18,7 @@ export class RecordService {
 				.audioChannels(1)
 				.audioFrequency(16000)
 				.audioFilters('highpass=f=200')
-				.audioFilters('atempo=0.8')
+				.audioFilters('atempo=0.6')
 				.audioFilters('loudnorm')
 				.audioFilters('equalizer=f=1000:t=h:width=200:g=-10')
 				.output('output.wav')
@@ -66,23 +34,33 @@ export class RecordService {
 		});
 	}
 
-	async recordVoiceNew() {
+	async recordVoice() {
 		const outputFileStream = fs.createWriteStream('output.raw');
 		const mic = new Mic();
 		const micStream = mic.startRecording();
+
 		micStream.pipe(outputFileStream);
+
+		this.recordingStatus = 'recording';
 		await new Promise(resolve => {
-			setTimeout(() => {
-				console.info('stopped recording');
-				mic.stopRecording();
-				resolve('stopped recording');
-			}, 5000);
+			const interval = setInterval(() => {
+				console.log('recordingStatus', this.recordingStatus);
+				if (this.recordingStatus === 'stops') {
+					mic.stopRecording();
+					this.recordingStatus = 'end';
+					clearInterval(interval);
+					resolve('Recording stopped recordVoiceNew');
+				}
+			}, 2000);
 		});
-		mic.on('info', info => {
-			console.log(info);
-		});
-		mic.on('error', error => {
-			console.log(error);
-		});
+	}
+
+	async startRecording() {
+		if (this.recordingStatus === 'recording') {
+			this.recordingStatus = 'stops';
+		} else if (this.recordingStatus === 'end') {
+			console.log('startRecording запущена');
+			await this.recordVoice();
+		}
 	}
 }

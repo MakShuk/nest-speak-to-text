@@ -12,18 +12,13 @@ export class RecordController {
 
 	@Get('record')
 	RecordVoice() {
-		return this.recordService.recordVoiceOld();
+		return this.recordService.recordVoice();
 	}
 
 	@Get('record-and-convert')
 	async transcribe() {
-		await this.recordService.recordVoiceNew();
+		await this.recordService.recordVoice();
 		await this.recordService.convertToWav();
 		return 'recorded and converted to wav!';
-	}
-
-	@Get('node-record')
-	nodeRecord() {
-		return this.recordService.recordVoiceNew();
 	}
 }

@@ -11,7 +11,8 @@ export class AppController implements OnModuleInit {
 	@Get('record-and-convert-to-text')
 	async recordAndConvertToText(): Promise<string> {
 		try {
-			return await this.appService.recordAndConvertToText();
+			await this.appService.recordAndConvertToText();
+			return 'recorded and converted to text!';
 		} catch (error) {
 			console.error(error);
 			throw new HttpException(

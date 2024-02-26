@@ -14,13 +14,18 @@ export class AppService {
 		private readonly openaiService: OpenaiService,
 	) {}
 	recordAndConvertToText = async (): Promise<string> => {
-		await this.recordService.recordVoiceNew();
-		await this.recordService.convertToWav();
-		const stream = fs.createReadStream('C:/development/NestJS/speak-to-text/output.wav');
-		const result = await this.openaiService.transcriptionAudio(stream);
-		const text = result.content || 'Ошибка при чтении файла';
-		this.textInBuffer = text;
-		return text;
+		await this.recordService.startRecording();
+		if (this.recordService.recordingStatus !== 'end') {
+			await this.recordService.convertToWav();
+			const stream = fs.createReadStream('C:/development/NestJS/speak-to-text/output.wav');
+			const result = await this.openaiService.transcriptionAudio(stream);
+			const text = result.content || 'Ошибка при чтении файла';
+			this.textInBuffer = text;
+			console.log('Распознан текст ', text);
+			return 'no action';
+		} else {
+			return 'action';
+		}
 	};
 
 	keyAction(): void {
@@ -28,15 +33,21 @@ export class AppService {
 
 		v.addListener(e => {
 			if (e.state == 'DOWN' && e.name == 'F19') {
-				this.recordAndConvertToText().then(() => {
-					this.pasteKeyAction();
+				this.recordAndConvertToText().then(value => {
+					if (value === 'no action') {
+						this.copyAndPasteText();
+					}
 				});
 			}
 		});
 	}
 
-	async pasteKeyAction(): Promise<void> {
-		console.log('textInBuffer', this.textInBuffer);
+	async copyAndPasteText(): Promise<void> {
+		await this.copyTextInBuffer();
+		await this.pasteKeyAction();
+	}
+
+	async copyTextInBuffer(): Promise<void> {
 		await new Promise((resolve, reject) => {
 			copyPaste.copy(this.textInBuffer, error => {
 				if (error) {
@@ -46,8 +57,15 @@ export class AppService {
 				}
 			});
 		});
-		robot.keyToggle('control', 'down');
-		robot.keyTap('v');
-		robot.keyToggle('control', 'up');
+	}
+
+	async pasteKeyAction(): Promise<void> {
+		await this.copyTextInBuffer();
+		await new Promise(resolve => {
+			setTimeout(() => {
+				robot.keyTap('v', 'control');
+				resolve('Text pasted');
+			}, 1000);
+		});
 	}
 }
