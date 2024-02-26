@@ -44,6 +44,7 @@ export class RecordService {
 		this.recordingStatus = 'recording';
 		await new Promise(resolve => {
 			const interval = setInterval(() => {
+				console.log('Запущен цикл');
 				console.log('recordingStatus', this.recordingStatus);
 				if (this.recordingStatus === 'stops') {
 					mic.stopRecording();
@@ -51,7 +52,7 @@ export class RecordService {
 					clearInterval(interval);
 					resolve('Recording stopped recordVoiceNew');
 				}
-			}, 2000);
+			}, 200);
 		});
 	}
 

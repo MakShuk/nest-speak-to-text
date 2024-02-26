@@ -43,29 +43,44 @@ export class AppService {
 	}
 
 	async copyAndPasteText(): Promise<void> {
-		await this.copyTextInBuffer();
-		await this.pasteKeyAction();
+		try {
+			await this.copyTextInBuffer();
+			await this.pasteKeyAction();
+		} catch (error) {
+			console.error('Error occurred while copying and pasting text:', error);
+		}
 	}
 
 	async copyTextInBuffer(): Promise<void> {
 		await new Promise((resolve, reject) => {
 			copyPaste.copy(this.textInBuffer, error => {
 				if (error) {
+					console.error('Error occurred while copying text to clipboard:', error);
 					reject(error);
 				} else {
-					resolve('Text copied to clipboard');
+					console.log('Text copied to clipboard');
+					resolve(null);
 				}
 			});
 		});
 	}
 
 	async pasteKeyAction(): Promise<void> {
-		await this.copyTextInBuffer();
-		await new Promise(resolve => {
-			setTimeout(() => {
-				robot.keyTap('v', 'control');
-				resolve('Text pasted');
-			}, 1000);
-		});
+		try {
+			await this.copyTextInBuffer();
+			await new Promise((resolve, reject) => {
+				setTimeout(() => {
+					try {
+						robot.keyTap('v', 'control');
+						resolve('Text pasted');
+					} catch (error) {
+						console.error('Error occurred while pasting text:', error);
+						reject(error);
+					}
+				}, 200);
+			});
+		} catch (error) {
+			console.error('Error occurred in pasteKeyAction:', error);
+		}
 	}
 }
