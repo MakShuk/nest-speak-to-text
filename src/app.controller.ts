@@ -12,13 +12,13 @@ export class AppController implements OnModuleInit {
 	async recordAndConvertToText(): Promise<string> {
 		try {
 			await this.appService.recordAndConvertToText();
-			return 'recorded and converted to text!';
+			return 'записано и преобразовано в текст!';
 		} catch (error) {
 			console.error(error);
 			throw new HttpException(
 				{
 					status: HttpStatus.INTERNAL_SERVER_ERROR,
-					error: 'There was a problem executing recordAndConvertToText',
+					error: 'Произошла ошибка при выполнении recordAndConvertToText',
 				},
 				HttpStatus.INTERNAL_SERVER_ERROR,
 			);
@@ -34,7 +34,7 @@ export class AppController implements OnModuleInit {
 			throw new HttpException(
 				{
 					status: HttpStatus.INTERNAL_SERVER_ERROR,
-					error: 'There was a problem executing keyAction',
+					error: 'Произошла ошибка при выполнении keyAction',
 				},
 				HttpStatus.INTERNAL_SERVER_ERROR,
 			);
@@ -51,7 +51,7 @@ export class AppController implements OnModuleInit {
 			throw new HttpException(
 				{
 					status: HttpStatus.INTERNAL_SERVER_ERROR,
-					error: 'There was a problem executing pasteKeyAction',
+					error: 'Произошла ошибка при выполнении pasteKeyAction',
 				},
 				HttpStatus.INTERNAL_SERVER_ERROR,
 			);

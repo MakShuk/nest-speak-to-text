@@ -17,7 +17,8 @@ export class AppService {
 		await this.recordService.startRecording();
 		if (this.recordService.recordingStatus !== 'end') {
 			await this.recordService.convertToWav();
-			const stream = fs.createReadStream('C:/development/NestJS/speak-to-text/output.wav');
+			const filePath = 'C:/development/NestJS/speak-to-text/output.wav';
+			const stream = fs.createReadStream(filePath);
 			const result = await this.openaiService.transcriptionAudio(stream);
 			const text = result.content || 'Ошибка при чтении файла';
 			this.textInBuffer = text;
@@ -47,7 +48,7 @@ export class AppService {
 			await this.copyTextInBuffer();
 			await this.pasteKeyAction();
 		} catch (error) {
-			console.error('Error occurred while copying and pasting text:', error);
+			console.error('Произошла ошибка при копировании и вставке текста:', error);
 		}
 	}
 
@@ -55,10 +56,10 @@ export class AppService {
 		await new Promise((resolve, reject) => {
 			copyPaste.copy(this.textInBuffer, error => {
 				if (error) {
-					console.error('Error occurred while copying text to clipboard:', error);
+					console.error('Произошла ошибка при копировании текста в буфер обмена:', error);
 					reject(error);
 				} else {
-					console.log('Text copied to clipboard');
+					console.log('Текст скопирован в буфер обмена');
 					resolve(null);
 				}
 			});
@@ -74,13 +75,13 @@ export class AppService {
 						robot.keyTap('v', 'control');
 						resolve('Text pasted');
 					} catch (error) {
-						console.error('Error occurred while pasting text:', error);
+						console.error('Произошла ошибка при вставке текста:', error);
 						reject(error);
 					}
 				}, 200);
 			});
 		} catch (error) {
-			console.error('Error occurred in pasteKeyAction:', error);
+			console.error('Произошла ошибка в pasteKeyAction:', error);
 		}
 	}
 }
