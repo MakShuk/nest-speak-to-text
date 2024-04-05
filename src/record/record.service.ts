@@ -26,7 +26,7 @@ export class RecordService {
 					console.log('File has been converted succesfully');
 					resolve('File has been converted succesfully');
 				})
-				.on('error', err => {
+				.on('error', (err: Error) => {
 					console.log('an error happened: ' + err.message);
 					reject(err);
 				})

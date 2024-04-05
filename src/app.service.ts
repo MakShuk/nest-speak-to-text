@@ -13,6 +13,7 @@ export class AppService {
 		private readonly recordService: RecordService,
 		private readonly openaiService: OpenaiService,
 	) {}
+
 	recordAndConvertToText = async (): Promise<string> => {
 		await this.recordService.startRecording();
 		if (this.recordService.recordingStatus !== 'end') {
@@ -49,6 +50,23 @@ export class AppService {
 			await this.pasteKeyAction();
 		} catch (error) {
 			console.error('Произошла ошибка при копировании и вставке текста:', error);
+		}
+	}
+
+	async deleteSymbol(text: string): Promise<void> {
+		try {
+			await new Promise((resolve, reject) => {
+				setTimeout(() => {
+					try {
+						robot.keyTap('backspace');
+					} catch (error) {
+						console.error('Произошла ошибка при вставке текста:', error);
+						reject(error);
+					}
+				}, 100);
+			});
+		} catch (error) {
+			console.error('Произошла ошибка в pasteKeyAction:', error);
 		}
 	}
 
