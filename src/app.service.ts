@@ -33,7 +33,7 @@ export class AppService {
 		const v = new GlobalKeyboardListener();
 
 		v.addListener(e => {
-			if (e.state == 'DOWN' && e.name == 'F19') {
+			if (e.state == 'DOWN' && e.name == 'F12') {
 				this.recordAndConvertToText().then(value => {
 					if (value === 'no action') {
 						this.copyAndPasteText();
