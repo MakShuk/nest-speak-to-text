@@ -93,7 +93,7 @@ export class OpenaiService {
 			if (error instanceof OpenAI.APIError) {
 				const { status, message, code, type } = error;
 				const errorMessage = `status: ${status} message: ${message} code: ${code} type: ${type}`;
-				console.error(errorMessage);
+				console.error(error);
 				return {
 					role: 'assistant',
 					content: errorMessage,

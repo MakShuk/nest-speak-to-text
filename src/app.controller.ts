@@ -57,4 +57,9 @@ export class AppController implements OnModuleInit {
 			);
 		}
 	}
+	@Get('play-sound')
+	playSound(): void {
+		console.log('play');
+		this.appService.playSound();
+	}
 }

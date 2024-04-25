@@ -52,7 +52,7 @@ export class RecordService {
 					clearInterval(interval);
 					resolve('Recording stopped recordVoiceNew');
 				}
-			}, 200);
+			}, 400);
 		});
 	}
 

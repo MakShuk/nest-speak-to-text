@@ -5,6 +5,8 @@ import { GlobalKeyboardListener } from 'node-global-key-listener';
 import * as copyPaste from 'copy-paste';
 import * as fs from 'fs';
 import * as robot from 'robotjs';
+const path = require('path');
+const sound = require('sound-play');
 
 @Injectable()
 export class AppService {
@@ -15,26 +17,33 @@ export class AppService {
 	) {}
 
 	recordAndConvertToText = async (): Promise<string> => {
+		if (this.recordService.recordingStatus === 'end') {
+			this.playSound();
+		}
 		await this.recordService.startRecording();
 		if (this.recordService.recordingStatus !== 'end') {
 			await this.recordService.convertToWav();
+			console.log('convertToWav');
 			const filePath = 'C:/development/NestJS/speak-to-text/output.wav';
 			const stream = fs.createReadStream(filePath);
 			const result = await this.openaiService.transcriptionAudio(stream);
+			console.log(result);
 			const text = result.content || 'Ошибка при чтении файла';
 			this.textInBuffer = text;
 			console.log('Распознан текст ', text);
 			return 'no action';
 		} else {
+			this.playSound('end');
 			return 'action';
 		}
 	};
 
+	
 	keyAction(): void {
 		const v = new GlobalKeyboardListener();
 
 		v.addListener(e => {
-			if (e.state == 'DOWN' && e.name == 'F12') {
+			if (e.state == 'DOWN' && e.name == 'F19') {
 				this.recordAndConvertToText().then(value => {
 					if (value === 'no action') {
 						this.copyAndPasteText();
@@ -101,5 +110,13 @@ export class AppService {
 		} catch (error) {
 			console.error('Произошла ошибка в pasteKeyAction:', error);
 		}
+	}
+
+	playSound(file: 'start' | 'end' = 'start'): void {
+		const startPath = path.join(__dirname, '../foo.mp3');
+		const endPath = path.join(__dirname, '../sfx.mp3');
+		const filePath = file === 'start' ? startPath : endPath;
+		console.log(filePath);
+		sound.play(filePath);
 	}
 }
